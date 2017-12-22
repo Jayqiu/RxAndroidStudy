@@ -15,10 +15,11 @@
 ## RxJava多线程选项
 | name           | 说明           |
 | ---------------|:--------------:|
-|Schedulers.io() |代表io操作的线程, 通常用于网络,读写文件等io密集型的操作<br>|
-|Schedulers.computation() |代表CPU计算密集型的操作, 即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。<br>
-|Schedulers.newThread()| 代表一个常规的新线程<br>
-|AndroidSchedulers.mainThread()| 代表Android的主线程
+|Schedulers.io() |代表io操作的线程, 通常用于网络,读写文件等io密集型的操作|
+|Schedulers.computation() |代表CPU计算密集型的操作, 即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。|
+|Schedulers.newThread()| 代表一个常规的新线程|
+|AndroidSchedulers.mainThread()| 代表Android的主线程|
+
 newThread() 差不多，区别在于 io() 的内部实现是是用一个无数量上限的线程池，可以重用空闲的线程，因此多数情况下 io() 比 newThread() 更有效率。不要把计算工作放在 io() 中，可以避免创建不必要的线程。
 
 ## 创建一个普通的
