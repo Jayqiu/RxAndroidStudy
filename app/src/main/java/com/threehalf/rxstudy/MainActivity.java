@@ -401,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void redDocFile() {
+        //Flowable里默认有一个大小为128的水缸
         Flowable flowable = Flowable.create(new FlowableOnSubscribe<String>() {
             @Override
             public void subscribe(FlowableEmitter<String> emitter) throws Exception {

@@ -1,13 +1,27 @@
 #   RxAndroid 学习和操作符的理解
-## 创建一个普通的
+## RxJava 的观察者模式
+1）RxJava 有四个基本概念：Observable (可观察者，即被观察者)、 Observer (观察者)、 subscribe (订阅)、事件。Observable 和 Observer 通过 subscribe() 方法实现订阅关系，从而 Observable 可以在需要的时候发出事件来通知 Observer。<br>
+2）与传统观察者模式不同， RxJava 的事件回调方法除了普通事件 onNext() （相当于 onClick() / onEvent()）之外，还定义了两个特殊的事件：onCompleted() 和 onError()。<br>
+3）onCompleted(): 事件队列完结。RxJava 不仅把每个事件单独处理，还会把它们看做一个队列。RxJava 规定，当不会再有新的 onNext() 发出时，需要触发 onCompleted() 方法作为标志。<br>
+4）onError(): 事件队列异常。在事件处理过程中出异常时，onError() 会被触发，同时队列自动终止，不允许再有事件发出。<br>
+5）在一个正确运行的事件序列中, onCompleted() 和 onError() 有且只有一个，并且是事件序列中的最后一个。需要注意的是，onCompleted() 和 onError() 二者也是互斥的，即在队列中调用了其中一个，就不应该再调用另一个。<br>
+
 上游可以发送无限个onNext, 下游也可以接收无限个onNext.
 当上游发送了一个onComplete后, 上游onComplete之后的事件将会继续发送, 而下游收到onComplete事件之后将不再继续接收事件.
 当上游发送了一个onError后, 上游onError之后的事件将继续发送, 而下游收到onError事件之后将不再继续接收事件.
 上游可以不发送onComplete或onError.
 最为关键的是onComplete和onError必须唯一并且互斥, 即不能发多个onComplete, 也不能发多个onError, 也不能先发一个onComplete, 然后再发一个onError
 
+## RxJava多线程选项
+| name           | 说明           |
+| ---------------|:--------------:|
+|Schedulers.io() |代表io操作的线程, 通常用于网络,读写文件等io密集型的操作<br>|
+|Schedulers.computation() |代表CPU计算密集型的操作, 即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。<br>
+|Schedulers.newThread()| 代表一个常规的新线程<br>
+|AndroidSchedulers.mainThread()| 代表Android的主线程
+newThread() 差不多，区别在于 io() 的内部实现是是用一个无数量上限的线程池，可以重用空闲的线程，因此多数情况下 io() 比 newThread() 更有效率。不要把计算工作放在 io() 中，可以避免创建不必要的线程。
 
-
+## 创建一个普通的
 ```java
 private void create() {
         Observable.create(new ObservableOnSubscribe<Integer>() {
@@ -218,7 +232,7 @@ private void flatMap() {
     }
 ```
 
-## zip
+## Zip通过一个函数将多个Observable发送的事件结合到一起，然后发送这些组合到一起的事件. 它按照严格的顺序应用这个函数。它只发射与发射数据项最少的那个Observable一样多的数据。
 ```java
    private void zip() {
         Observable observable = Observable.create(new ObservableOnSubscribe<Integer>() {
